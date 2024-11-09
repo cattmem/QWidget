@@ -1,15 +1,20 @@
 import sys
 
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget,
-                             QListWidgetItem, QLabel,
-                             QGridLayout)
+from PyQt6.QtWidgets import (QApplication, QMainWindow,
+                             QLabel, QPushButton,
+                             QSizePolicy)
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 
 from ui.main_ui import Ui_MainWindow
 
+import ui.main.home_ui as main_home
+import ui.main.test as main_test
 
-MENU = ('Главная', 'Виджеты', 'Редактор')
+
+MENU = ({ 'title': 'Главная',  'frame': main_home },
+        { 'title': 'Виджеты',  'frame': main_test },
+        { 'title': 'Редактор', 'frame': main_test })
 
 
 class MainWindow(QMainWindow):
@@ -26,38 +31,88 @@ class MainWindow(QMainWindow):
     
     def initUI(self) -> None:
         # easy data
-        self.side_menu = self.ui.listMenu
         self.main = self.ui.stackedWidget
+        self.side_menu = self.ui.leftSideLayout
 
-        # visual
-        self.side_menu.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.buttons = []
 
-        # clear widgets
-        self.side_menu.clear()
-        widgets = self.main.findChildren(QWidget)
-        for widget in widgets:
-            self.main.removeWidget(widget)
+        font = QFont('src\fonts\Inter.ttf')
+        font.setPixelSize(14)
     
-        for title in MENU:
+        for i, page in enumerate(MENU):
             # side menu ---------------
-            item = QListWidgetItem()
-            font = QFont('src\fonts\Inter.ttf')
-            item.setText(title)
-            item.setFont(font)
-            self.side_menu.addItem(item)
+            button = QPushButton(page['title'])
+            button.setFont(font)
+            button.setMinimumWidth(190)
+            button.setObjectName(str(i))
+            button.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+            button.clicked.connect(self.change_page)
+            self.buttons.append(button)
+            self.side_menu.addWidget(button)
 
             # main --------------------
-            grid_layout = QGridLayout()
-            label = QLabel(title)
-            grid_layout.addWidget(label)
+            self.main.addWidget(page['frame'].Ui_Form())
+        
+        self.buttons[0].click()
+        
+        spacer = QLabel()
+        spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        spacer.setStyleSheet('border-right: 1px solid #4F4F4F;')
+        self.side_menu.addWidget(spacer)
+    
+    def change_page(self) -> None:
+        i = int(self.sender().objectName())
+        self.main.setCurrentIndex(i)
 
-            widget = QWidget()
-            widget.setLayout(grid_layout)
+        # -------------------------------------------------
+        # SO BAD CODE
+        # time release
+        # -------------------------------------------------
 
-            self.main.addWidget(widget)
+        # clear selecting
+        for btn in self.buttons:
+            if i < int(btn.objectName()):
+                btn.setStyleSheet('''
+                                  margin: 0;
+                                  padding: 15px;
+                                  border-radius: 0;
+                                  border-bottom: 1px solid #4F4F4F;
+                                  border-right: 1px solid #4F4F4F;
+                                  text-align:left;
+                                  background: #151515;
+                                  color: #818181;
+                                  ''')
+            elif i > int(btn.objectName()):
+                btn.setStyleSheet('''
+                                  margin: 0;
+                                  padding: 15px;
+                                  border-radius: 0;
+                                  border-top: 1px solid #4F4F4F;
+                                  border-right: 1px solid #4F4F4F;
+                                  text-align:left;
+                                  background: #151515;
+                                  color: #818181;
+                                  ''')
+            else:
+                btn.setStyleSheet('''
+                                  margin: 0;
+                                  padding: 15px;
+                                  border-radius: 0;
+                                  border-top: 1px solid #3A5CE4;
+                                  border-bottom: 1px solid #3A5CE4;
+                                  border-right: 1px solid #3A5CE4;
+                                  text-align:left;
+                                  background: #3A5CE4;
+                                  color: #151515;
+                                  ''')
 
-        # connect side menu and main
-        self.side_menu.currentRowChanged['int'].connect(self.main.setCurrentIndex)
+    def mousePressEvent(self, event) -> None:
+        self.dragPos = event.globalPosition().toPoint()
+
+    def mouseMoveEvent(self, event) -> None:
+        self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
+        self.dragPos = event.globalPosition().toPoint()
+        event.accept()
 
 
 if __name__ == '__main__':

@@ -6,25 +6,28 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>630</width>
-    <height>430</height>
+    <width>800</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>0</y>
-      <width>631</width>
-      <height>431</height>
+      <width>801</width>
+      <height>601</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="bottomMargin">
       <number>0</number>
      </property>
      <item>
@@ -36,14 +39,14 @@
         <enum>QLayout::SetMinimumSize</enum>
        </property>
        <item>
-        <spacer name="horizontalSpacer">
+        <spacer name="topSpace">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
            <width>40</width>
-           <height>20</height>
+           <height>38</height>
           </size>
          </property>
         </spacer>
@@ -101,32 +104,40 @@
          <property name="sizeConstraint">
           <enum>QLayout::SetMinimumSize</enum>
          </property>
-         <item>
-          <widget class="QListWidget" name="listMenu">
-           <property name="minimumSize">
-            <size>
-             <width>54</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>190</width>
-             <height>16777215</height>
-            </size>
-           </property>
-          </widget>
-         </item>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
         </layout>
        </item>
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>1</number>
+          <number>-1</number>
          </property>
-         <widget class="QWidget" name="page"/>
-         <widget class="QWidget" name="page_2"/>
         </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="bottomLayer">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="sizeConstraint">
+        <enum>QLayout::SetMinimumSize</enum>
+       </property>
+       <item>
+        <spacer name="bottomSpace">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>30</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </item>
