@@ -3,7 +3,7 @@
     background: #151515;
 }
 
-QWidget {
+#centralwidget QWidget {
     background: #151515;
 }
 

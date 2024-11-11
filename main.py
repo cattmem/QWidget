@@ -114,11 +114,11 @@ class MainWindow(QMainWindow):
                                   ''')
 
     def mousePressEvent(self, event) -> None:
-        self.dragPos = event.globalPosition().toPoint()
+        self.drag_pos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event) -> None:
-        self.move(self.pos() + event.globalPosition().toPoint() - self.dragPos)
-        self.dragPos = event.globalPosition().toPoint()
+        self.move(self.pos() + event.globalPosition().toPoint() - self.drag_pos)
+        self.drag_pos = event.globalPosition().toPoint()
         event.accept()
 
 
