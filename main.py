@@ -37,8 +37,15 @@ class MainWindow(QMainWindow):
         self.buttons = []
 
         font = QFont('src\fonts\Inter.ttf')
-        font.setPixelSize(14)
-    
+        font.setPixelSize(13)
+
+        self.ui.topLayout.setContentsMargins(189, 0, 0, 0)
+        spacer = QLabel()
+        spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        spacer.setMaximumHeight(30)
+        spacer.setStyleSheet('border-right: 1px solid #4F4F4F;')
+        self.side_menu.addWidget(spacer)
+
         for i, page in enumerate(MENU):
             # side menu ---------------
             button = QPushButton(page['title'])
@@ -61,7 +68,7 @@ class MainWindow(QMainWindow):
         self.side_menu.addWidget(spacer)
     
     def change_page(self) -> None:
-        i = int(self.sender().objectName())
+        i = int(self.buttons.index(self.sender()))
         self.main.setCurrentIndex(i)
 
         # -------------------------------------------------
@@ -71,7 +78,7 @@ class MainWindow(QMainWindow):
 
         # clear selecting
         for btn in self.buttons:
-            if i < int(btn.objectName()):
+            if i < int(self.buttons.index(btn)):
                 btn.setStyleSheet('''
                                   margin: 0;
                                   padding: 15px;
@@ -82,7 +89,7 @@ class MainWindow(QMainWindow):
                                   background: #151515;
                                   color: #818181;
                                   ''')
-            elif i > int(btn.objectName()):
+            elif i > int(self.buttons.index(btn)):
                 btn.setStyleSheet('''
                                   margin: 0;
                                   padding: 15px;

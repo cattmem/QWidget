@@ -1,31 +1,31 @@
-QMainWindow, QListWidget#listMenu, QWidget {
+#centralwidget {
+    border-radius: 10px;
     background: #151515;
 }
 
-QMainWindow {
-    border-radius: 10px;
+QWidget {
+    background: #151515;
 }
 
 
-#leftSideLayout: {
-    background: red;
-}
-
-
-#stackedWidget > * {
-    border-top: 1px solid #4F4F4F;
-    border-left: 1px solid #4F4F4F;
+#topSpace {
     border-bottom: 1px solid #4F4F4F;
-    border-top-left-radius: 10px;
 }
-
 
 #close, #hide {
+    background: #151515;
     padding: 0;
     border-radius: 0;
     margin: 0;
-    color: red;
+    border-bottom: 1px solid #4F4F4F;
 }
+
 #hide {
+    background: #151515;
     border-left: 1px solid #4F4F4F;
+}
+
+
+#bottomSpace {
+    border-top: 1px solid #4F4F4F;
 }
