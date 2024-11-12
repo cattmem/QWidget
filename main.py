@@ -3,13 +3,14 @@ import sys
 from PyQt6.QtWidgets import (QApplication, QMainWindow,
                              QLabel, QPushButton,
                              QSizePolicy)
-from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 
 from ui.main_ui import Ui_MainWindow
 
 import ui.main.home_ui as main_home
 import ui.main.test as main_test
+
+from src.fonts.connect import fonts
 
 
 MENU = ({ 'title': 'Главная',  'frame': main_home },
@@ -36,9 +37,6 @@ class MainWindow(QMainWindow):
 
         self.buttons = []
 
-        font = QFont('src\fonts\Inter.ttf')
-        font.setPixelSize(13)
-
         self.ui.topLayout.setContentsMargins(189, 0, 0, 0)
         spacer = QLabel()
         spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
@@ -49,10 +47,11 @@ class MainWindow(QMainWindow):
         for i, page in enumerate(MENU):
             # side menu ---------------
             button = QPushButton(page['title'])
-            button.setFont(font)
+            button.setFont(fonts.side)
             button.setMinimumWidth(190)
             button.setObjectName(str(i))
             button.setLayoutDirection(Qt.LayoutDirection.LeftToRight)
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
             button.clicked.connect(self.change_page)
             self.buttons.append(button)
             self.side_menu.addWidget(button)
@@ -76,10 +75,11 @@ class MainWindow(QMainWindow):
         # time release
         # -------------------------------------------------
 
+        fixed = '''QPushButton:hover { background: #4F4F4F; color: #151515 }'''
         # clear selecting
         for btn in self.buttons:
             if i < int(self.buttons.index(btn)):
-                btn.setStyleSheet('''
+                btn.setStyleSheet('''QPushButton {
                                   margin: 0;
                                   padding: 15px;
                                   border-radius: 0;
@@ -87,10 +87,10 @@ class MainWindow(QMainWindow):
                                   border-right: 1px solid #4F4F4F;
                                   text-align:left;
                                   background: #151515;
-                                  color: #818181;
-                                  ''')
+                                  color: #818181; }
+                                  ''' + fixed)
             elif i > int(self.buttons.index(btn)):
-                btn.setStyleSheet('''
+                btn.setStyleSheet('''QPushButton {
                                   margin: 0;
                                   padding: 15px;
                                   border-radius: 0;
@@ -98,10 +98,10 @@ class MainWindow(QMainWindow):
                                   border-right: 1px solid #4F4F4F;
                                   text-align:left;
                                   background: #151515;
-                                  color: #818181;
-                                  ''')
+                                  color: #818181; }
+                                  ''' + fixed)
             else:
-                btn.setStyleSheet('''
+                btn.setStyleSheet('''QPushButton {
                                   margin: 0;
                                   padding: 15px;
                                   border-radius: 0;
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
                                   border-right: 1px solid #3A5CE4;
                                   text-align:left;
                                   background: #3A5CE4;
-                                  color: #151515;
+                                  color: #151515; }
                                   ''')
 
     def mousePressEvent(self, event) -> None:
