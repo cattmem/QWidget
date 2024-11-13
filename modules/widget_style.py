@@ -74,3 +74,4 @@ class ListWidget(QWidget):
         all_widget.addWidget(buttons_widget)
         ##
         self.setLayout(all_widget)
+        self.setMaximumWidth(144)

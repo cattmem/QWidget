@@ -8,14 +8,13 @@ from PyQt6.QtCore import Qt
 from ui.main_ui import Ui_MainWindow
 
 import ui.main.home_ui as main_home
-import ui.main.test as main_test
+import ui.main.widgets_list_ui as main_widgets
 
 from src.fonts.connect import fonts
 
 
-MENU = ({ 'title': 'Главная',  'frame': main_home },
-        { 'title': 'Виджеты',  'frame': main_test },
-        { 'title': 'Редактор', 'frame': main_test })
+MENU = ({ 'title': 'Главная', 'frame': main_home },
+        { 'title': 'Виджеты', 'frame': main_widgets })
 
 
 class MainWindow(QMainWindow):

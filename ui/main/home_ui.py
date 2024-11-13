@@ -18,9 +18,10 @@ class Ui_Form(QWidget):
 
         w = Widget('', '', lambda a: a, '', lambda a: a)
 
-        data = widgets.Ui_Form('Загружено', [w, w, w])
+        data = widgets.Ui_Form('Загружено', [w, w, w, w, w, w, w])
         layout.addWidget(data)
-        data = widgets.Ui_Form('Выгружено', [w, w, w, w, w, w])
+
+        data = widgets.Ui_Form('Выгружено', [w, w, w, w, w])
         layout.addWidget(data)
 
         spacer = QSpacerItem(1, 1, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
