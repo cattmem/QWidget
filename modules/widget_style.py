@@ -75,3 +75,4 @@ class ListWidget(QWidget):
         ##
         self.setLayout(all_widget)
         self.setMaximumWidth(144)
+        self.setMaximumHeight(200)

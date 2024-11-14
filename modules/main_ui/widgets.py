@@ -14,18 +14,23 @@ class Ui_Form(QWidget):
         super().__init__()
     
         box = QVBoxLayout()
-        box.setContentsMargins(19, 15, 0, 0)
+        box.setContentsMargins(0, 15, 0, 0)
         box.setSpacing(11)
 
         title_label = QLabel(title_form)
         title_label.setFont(fonts.title)
-        title_label.setStyleSheet('color: #DBDBDB')
+        title_label.setStyleSheet('color: #DBDBDB; margin-left: 15px')
         box.addWidget(title_label)
         
         # ------------------
         widget_list_layout = QHBoxLayout()
         widget_list_layout.setSpacing(11)
         widget_list_layout.setContentsMargins(0, 0, 0, 0)
+
+        spacer = QLabel()
+        spacer.setFixedSize(8, 1)
+        widget_list_layout.addWidget(spacer)
+
         for widget in widgets_data:
             widget_layout = QHBoxLayout()
             widget_layout.setContentsMargins(0, 0, 0, 0)
@@ -33,6 +38,10 @@ class Ui_Form(QWidget):
             widget_layout.addWidget(ListWidget(widget))
 
             widget_list_layout.addLayout(widget_layout)
+        
+        spacer = QLabel()
+        spacer.setFixedSize(8, 1)
+        widget_list_layout.addWidget(spacer)
 
         spacer = QSpacerItem(1, 1, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         widget_list_layout.addItem(spacer)
