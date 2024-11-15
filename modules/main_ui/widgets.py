@@ -66,7 +66,10 @@ class Ui_Form(QWidget):
                                  background: none;
                                  }
                                  QScrollBar::add-line, QScrollBar::sub-line  {
-                                 background: none; }''')
+                                 background: none; }
+                                 QScrollBar::up-arrow, QScrollBar::down-arrow {
+                                 background: none;
+                                 }''')
         scroll_box.setFixedHeight(217)
 
         scroll_box.setWidget(box_widget)

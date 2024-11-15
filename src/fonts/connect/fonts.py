@@ -9,3 +9,8 @@ title.setWeight(600)
 side = QFont('..\\Inter.ttf')
 side.setPixelSize(13)
 side.setWeight(400)
+
+# line edit style
+line_edit = QFont('..\\Inter.ttf')
+line_edit.setPixelSize(16)
+line_edit.setWeight(400)
