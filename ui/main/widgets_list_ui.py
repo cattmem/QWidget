@@ -45,7 +45,7 @@ class Ui_Form(QWidget):
                                       background: #151515;
                                       color: #818181; }
                                       QPushButton:!enabled {
-                                      opacity: .5;
+                                      background: #1A1A1A;
                                       }
                                       QPushButton:hover:!pressed {
                                       background: #4F4F4F; }
@@ -63,6 +63,9 @@ class Ui_Form(QWidget):
                                       border-top: 1px solid #4F4F4F;
                                       background: #151515;
                                       color: #818181; }
+                                      QPushButton:!enabled {
+                                      background: #1A1A1A;
+                                      }
                                       QPushButton:hover:!pressed {
                                       background: #4F4F4F; }
                                       QPushButton:pressed {
@@ -110,15 +113,15 @@ class Ui_Form(QWidget):
         self.setLayout(all_box)
 
     def update(self) -> None:
-        self.back_arrow.setHidden(False)
-        self.next_arrow.setHidden(False)
+        self.back_arrow.setDisabled(False)
+        self.next_arrow.setDisabled(False)
         self.widgets = db.get_widgets(self.page, self.title)
         self.max_page = db.get_max_pages(self.title)
 
         if self.page == 0:
-            self.back_arrow.setHidden(True)
+            self.back_arrow.setDisabled(True)
         if self.page == self.max_page:
-            self.next_arrow.setHidden(True)
+            self.next_arrow.setDisabled(True)
 
         while self.box.count():
             w = self.box.itemAt(0).widget()
