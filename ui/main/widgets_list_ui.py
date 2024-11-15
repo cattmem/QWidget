@@ -31,7 +31,7 @@ class Ui_Form(QWidget):
 
         self.box = QGridLayout()
         self.box.setContentsMargins(15, 0, 15, 0)
-        self.box.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.box.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.box.setSpacing(11)
 
         buttons = QHBoxLayout()
