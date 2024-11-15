@@ -24,6 +24,7 @@ class Ui_Form(QWidget):
                                   padding: 15px;
                                   color: #DBDBDB;''')
         self.search.setFont(fonts.line_edit)
+        self.search.setPlaceholderText('Поиск')
         self.search.textChanged.connect(self.search_changed)
 
         all_box.addWidget(self.search)
