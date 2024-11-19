@@ -1,5 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (QWidget, QScrollArea, QLabel, QPushButton,
+from PyQt6.QtWidgets import (QWidget, QMainWindow, QScrollArea, QLabel, QPushButton,
                              QGridLayout, QHBoxLayout, QVBoxLayout, QLineEdit,
                              QSizePolicy, QSpacerItem)
 
@@ -7,15 +7,24 @@ from modules.widget_style import ListWidget
 from modules.widget_data import Widget
 from src.fonts.connect import fonts
 
+from modules.widget_form.widget import WidgetWindow
+
 from database.connect import database as db
 
+
 class Ui_Form(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, main: QMainWindow) -> None:
         super().__init__()
+
+        self.main = main
         
         all_box = QVBoxLayout()
         all_box.setContentsMargins(0, 0, 0, 0)
         all_box.setSpacing(0)
+
+        top_line = QHBoxLayout()
+        top_line.setContentsMargins(0, 0, 0, 0)
+        top_line.setSpacing(0)
         
         self.search = QLineEdit()
         self.search.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
@@ -27,7 +36,28 @@ class Ui_Form(QWidget):
         self.search.setPlaceholderText('Поиск')
         self.search.textChanged.connect(self.search_changed)
 
-        all_box.addWidget(self.search)
+        self.reload = QPushButton('⟳')
+        self.reload.setFont(fonts.line_edit)
+        self.reload.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Preferred)
+        self.reload.setStyleSheet('''QPushButton {
+                                  border: 0;
+                                  margin: 0;
+                                  padding: 0 20px;
+                                  border-bottom: 1px solid #4F4F4F;
+                                  border-left: 1px solid #4F4F4F;
+                                  background: #151515;
+                                  color: #818181; }
+                                  QPushButton:hover:!pressed {
+                                  background: #4F4F4F; }
+                                  QPushButton:pressed {
+                                  background: #3A5CE4;
+                                  border: 1px solid #3A5CE4; }''')
+        self.reload.clicked.connect(self.update)
+        
+        top_line.addWidget(self.search)
+        top_line.addWidget(self.reload)
+
+        all_box.addLayout(top_line)
 
         self.box = QGridLayout()
         self.box.setContentsMargins(15, 0, 15, 0)
@@ -42,6 +72,7 @@ class Ui_Form(QWidget):
                                       margin: 0;
                                       padding: 0;
                                       border-top: 1px solid #4F4F4F;
+                                      border-right: 1px solid #4F4F4F;
                                       background: #151515;
                                       color: #818181; }
                                       QPushButton:!enabled {
@@ -54,6 +85,14 @@ class Ui_Form(QWidget):
                                       border: 1px solid #3A5CE4;
                                       } ''')
         self.back_arrow.clicked.connect(self.back_page)
+
+        self.page_view = QLabel()
+        self.page_view.setFont(fonts.line_edit)
+        self.page_view.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        self.page_view.setFixedHeight(40)
+        self.page_view.setStyleSheet('''border-top: 1px solid #4F4F4F;
+                                     padding: 0 10px;''')
+
         self.next_arrow = QPushButton('>')
         self.next_arrow.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         self.next_arrow.setFixedHeight(40)
@@ -61,6 +100,7 @@ class Ui_Form(QWidget):
                                       margin: 0;
                                       padding: 0;
                                       border-top: 1px solid #4F4F4F;
+                                      border-left: 1px solid #4F4F4F;
                                       background: #151515;
                                       color: #818181; }
                                       QPushButton:!enabled {
@@ -105,18 +145,24 @@ class Ui_Form(QWidget):
         all_box.addWidget(self.scroll_box)
 
         buttons.addWidget(self.back_arrow)
+        buttons.addWidget(self.page_view)
         buttons.addWidget(self.next_arrow)
         buttons.setContentsMargins(0, 0, 0, 0)
         buttons.setSpacing(0)
         all_box.addLayout(buttons)
 
-        self.setLayout(all_box)
+        self.setLayout(all_box)   
 
     def update(self) -> None:
         self.back_arrow.setDisabled(False)
         self.next_arrow.setDisabled(False)
         self.widgets = db.get_widgets(self.page, self.title)
         self.max_page = db.get_max_pages(self.title)
+
+        if self.widgets:
+            self.page_view.setText(f'{self.page + 1} / {self.max_page + 1}')
+        else:
+            self.page_view.setText('Пусто')
 
         if self.page == 0:
             self.back_arrow.setDisabled(True)
@@ -136,8 +182,17 @@ class Ui_Form(QWidget):
         x, y = 0, 1
 
         while count < len(self.widgets):
-            widget = ListWidget(Widget('', '', lambda a: a, '', lambda a: a))
-            self.box.addWidget(widget, y, x, Qt.AlignmentFlag.AlignTop)
+            print(count)
+            indx = self.widgets[count][0]
+
+            # widget = Widget(indx, '', '', lambda a: a, '', lambda a: a)
+            # set_widgets(get_widgets() + [widget])
+            # get_widgets()[-1].b1_func = lambda _, wid=get_widgets()[-1].copy(): add_widget(wid)
+
+            widget = Widget(indx, True, '', '', lambda _: _, '', lambda _: _)
+            widget.b1_func = lambda _, indx=indx: self.main.open_widget(widget.copy(indx))
+            grid_widget = ListWidget(widget)
+            self.box.addWidget(grid_widget, y, x, Qt.AlignmentFlag.AlignTop)
             if x == 2:
                 y += 1
                 x = 0

@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import (QWidget, QLabel, QScrollArea,
+from PyQt6.QtWidgets import (QMainWindow, QWidget, QLabel, QScrollArea,
                              QVBoxLayout,
                              QSizePolicy, QSpacerItem, QGridLayout)
 
@@ -7,8 +7,10 @@ from modules.widget_data import Widget
 
 
 class Ui_Form(QWidget):
-    def __init__(self) -> None:
+    def __init__(self, main: QMainWindow) -> None:
         super().__init__()
+
+        self.main = main
 
         # scroll_box = QScrollArea()
     
@@ -16,13 +18,15 @@ class Ui_Form(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        w = Widget('', '', lambda a: a, '', lambda a: a)
+        self.data_load = widgets.Ui_Form('Загружено', [])
+        layout.addWidget(self.data_load)
 
-        data = widgets.Ui_Form('Загружено', [w, w, w, w, w, w, w])
-        layout.addWidget(data)
+        self.data_unload = widgets.Ui_Form('Выгружено', [])
+        layout.addWidget(self.data_unload)
 
-        data = widgets.Ui_Form('Выгружено', [w, w, w, w, w])
-        layout.addWidget(data)
+        # data_unload = widgets.Ui_Form('Выгружено', [])
+        # set_forms(get_forms() + data_load)
+        # layout.addWidget(data_unload)
 
         spacer = QSpacerItem(1, 1, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         layout.addItem(spacer)

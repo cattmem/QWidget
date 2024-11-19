@@ -1,16 +1,18 @@
 import sys
 
-from PyQt6.QtWidgets import (QApplication, QMainWindow,
+from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget,
                              QLabel, QPushButton,
                              QSizePolicy)
 from PyQt6.QtCore import Qt
 
 from ui.main_ui import Ui_MainWindow
 
-import ui.main.home_ui as main_home
-import ui.main.widgets_list_ui as main_widgets
+from modules.widget_data import Widget
 
 from src.fonts.connect import fonts
+
+import ui.main.home_ui as main_home
+import ui.main.widgets_list_ui as main_widgets
 
 
 MENU = ({ 'title': 'Главная', 'frame': main_home },
@@ -26,6 +28,8 @@ class MainWindow(QMainWindow):
 
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        self.widgets = []
 
         self.initUI()
     
@@ -43,6 +47,8 @@ class MainWindow(QMainWindow):
         spacer.setStyleSheet('border-right: 1px solid #4F4F4F;')
         self.side_menu.addWidget(spacer)
 
+        self.forms = []
+
         for i, page in enumerate(MENU):
             # side menu ---------------
             button = QPushButton(page['title'])
@@ -55,11 +61,13 @@ class MainWindow(QMainWindow):
             self.buttons.append(button)
             self.side_menu.addWidget(button)
 
-            # main --------------------
-            self.main.addWidget(page['frame'].Ui_Form())
+            # main -------------------
+            form = page['frame'].Ui_Form(self)
+            self.forms.append(form)
+            self.main.addWidget(form)
         
         self.buttons[0].click()
-        
+
         spacer = QLabel()
         spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         spacer.setStyleSheet('border-right: 1px solid #4F4F4F;')
@@ -111,6 +119,33 @@ class MainWindow(QMainWindow):
                                   background: #3A5CE4;
                                   color: #151515; }
                                   ''')
+                
+    def open_widget(self, widget: Widget) -> None:
+        self.widgets.append(widget)
+        self.load_widget(widget)
+        self.widgets[-1].qwidget.show()
+
+        self.update_forms()
+    
+    def load_widget(self, widget: Widget) -> None:
+        widget.loaded = True
+        widget.b1_func = lambda _, w=widget: self.unload_widget(w)
+        widget.qwidget.show()
+
+        self.update_forms()
+    
+    def unload_widget(self, widget: Widget) -> None:
+        widget.loaded = False
+        widget.b1_func = lambda _, w=widget: self.load_widget(w)
+        widget.qwidget.hide()
+        
+        self.update_forms()
+    
+    def update_forms(self) -> None:
+        self.forms[0].data_load.update(list(filter(lambda w: w.loaded, self.widgets)))
+        self.forms[0].data_unload.update(list(filter(lambda w: not w.loaded, self.widgets)))
+
+        print(list(map(lambda w: w.loaded, self.widgets)))
 
     def mousePressEvent(self, event) -> None:
         self.drag_pos = event.globalPosition().toPoint()

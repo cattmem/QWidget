@@ -9,7 +9,6 @@ from modules.widget_data import Widget
 class ListWidget(QWidget):
     def __init__(self, widget_data: Widget) -> None:
         super().__init__()
-        super().__init__()
 
         all_widget = QVBoxLayout()
         all_widget.setContentsMargins(0, 0, 0, 0)
