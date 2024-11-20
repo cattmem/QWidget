@@ -7,8 +7,9 @@ cursor = connect.cursor()
 
 def get_widgets(page: int, title: str | None = '') -> list[tuple]:
     result = cursor.execute(f'''select * from widgets
-                            where title like "%{title}%"''').fetchall()[page * 20:(page + 1) * 20]
-    return result
+                            where title like "%{title}%"
+                            order by star, title, id''').fetchall()[page * 20:(page + 1) * 20]
+    return result[::-1]
 
 
 def get_max_pages(title: str | None = '') -> int:
@@ -23,35 +24,34 @@ def get_title_by_id(id_widget: int) -> str:
     return result
 
 
-def add_widget(id_widget: int) -> None:
-    cursor.execute(f'''insert into used(local_title, load, widget)
-                   values (?, ?, ?)''',
-                   (get_title_by_id(id_widget), 1, id_widget,))
+def remove_widget(id_widget: int) -> None:
+    cursor.execute('''delete from widgets
+                   where id = ?''', (id_widget, ))
+    
     connect.commit()
 
 
-def get_load_widgets() -> None:
-    result = cursor.execute(f'''select title from widgets 
-                            where load = 1''').fetchall()
+def get_star(id_widget: int) -> int:
+    result = cursor.execute('''select star from widgets
+                            where id = ?''', (id_widget,)).fetchone()[0]
+    
     return result
 
-def set_load_widget(local_id_widget: int) -> None:
-    cursor.execute(f'''update used
-                   set load = 1
-                   where id = ?''',
-                   (local_id_widget, ))
+
+def change_star(id_widget: int) -> int:
+    cursor.execute(f'''update widgets
+                   set star = {0 if get_star(id_widget) else 1}
+                   where id = {id_widget}''')
+    
     connect.commit()
 
 
-def set_unload_widget(local_id_widget: int) -> None:
-    cursor.execute(f'''update used
-                   set load = 0
-                   where id = ?''',
-                   (local_id_widget, ))
+def new_widget(name: str) -> int:
+    cursor.execute(f'''insert into widgets(title,type)
+                   values("{name}", 1)''')
+    
     connect.commit()
-
-
-def remove_widget(local_id_widget: int) -> None:
-    cursor.execute('''delete from used
-                   where id = ?''',
-                   (local_id_widget,))
+    
+    result = cursor.execute('''select id from widgets
+                            order by id''').fetchall()[-1][0]
+    return result

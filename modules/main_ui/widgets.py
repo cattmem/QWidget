@@ -70,24 +70,25 @@ class Ui_Form(QWidget):
         self.setLayout(self.box)
     
     def update(self, widgets_data: list) -> None:
-        while self.widget_list_layout.count():
-            w = self.widget_list_layout.itemAt(0).widget()
-            self.widget_list_layout.removeWidget(w)
-            del w
+        try:
+            while self.widget_list_layout.count():
+                w = self.widget_list_layout.itemAt(0).widget()
+                self.widget_list_layout.removeWidget(w)
+                del w
         
-        widgets = widgets_data.copy()
+            widgets = widgets_data.copy()
 
-        spacer = QLabel()
-        spacer.setFixedSize(8, 1)
-        self.widget_list_layout.addWidget(spacer)
+            spacer = QLabel()
+            spacer.setFixedSize(8, 1)
+            self.widget_list_layout.addWidget(spacer)
 
-        if not widgets:
-            self.widget_list_layout.addWidget(NoneWidget())
-        else:
-            for widget in widgets:
-                self.widget_list_layout.addWidget(ListWidget(widget))
+            if not widgets:
+                self.widget_list_layout.addWidget(NoneWidget())
+            else:
+                for widget in widgets:
+                    list_widget = ListWidget(widget)
+                    widget.preview = list_widget.preview
+                    self.widget_list_layout.addWidget(ListWidget(widget))
     
-        
-        #spacer = QLabel()
-        #spacer.setFixedSize(8, 1)
-        #self.widget_list_layout.addWidget(spacer)
+        except Exception:
+            pass

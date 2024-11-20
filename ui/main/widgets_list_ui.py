@@ -1,13 +1,17 @@
+import os
+import shutil
+
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QWidget, QMainWindow, QScrollArea, QLabel, QPushButton,
                              QGridLayout, QHBoxLayout, QVBoxLayout, QLineEdit,
-                             QSizePolicy, QSpacerItem)
+                             QSizePolicy, QSpacerItem, QFileDialog)
+from PyQt6.QtGui import QPixmap
 
 from modules.widget_style import ListWidget
 from modules.widget_data import Widget
+from modules.widget_files_managment import export
 from src.fonts.connect import fonts
-
-from modules.widget_form.widget import WidgetWindow
+from src.images.connect import icons
 
 from database.connect import database as db
 
@@ -154,6 +158,25 @@ class Ui_Form(QWidget):
         self.setLayout(all_box)   
 
     def update(self) -> None:
+        def change_star(index: int) -> None:
+            db.change_star(index)
+            self.update()
+        
+        def remove_widget(index: int) -> None:
+            try:
+                db.remove_widget(index) 
+                os.chmod(f'widgets\\w_{index}', 0o777)
+                shutil.rmtree(f'widgets\\w_{index}')
+
+                self.update() 
+            except Exception as e:
+                print(e)
+        
+        def export_widget(index: int) -> None:
+            file, _ = QFileDialog.getSaveFileName(self, 'Сохранить файл', '', 'Виджет Qwidget (*.qwd)')
+            export(index, file)
+                
+
         self.back_arrow.setDisabled(False)
         self.next_arrow.setDisabled(False)
         self.widgets = db.get_widgets(self.page, self.title)
@@ -182,16 +205,24 @@ class Ui_Form(QWidget):
         x, y = 0, 1
 
         while count < len(self.widgets):
-            print(count)
             indx = self.widgets[count][0]
 
             # widget = Widget(indx, '', '', lambda a: a, '', lambda a: a)
             # set_widgets(get_widgets() + [widget])
             # get_widgets()[-1].b1_func = lambda _, wid=get_widgets()[-1].copy(): add_widget(wid)
 
-            widget = Widget(indx, True, '', '', lambda _: _, '', lambda _: _)
+            widget = Widget(indx, True, '', any, 0,
+                            icons.add, lambda _: _,
+                            (icons.full_star if db.get_star(indx) else icons.star), lambda _: _,
+                            [{'title': 'Экспорт', 'func': lambda id_: export_widget(id_)},
+                             {'title': 'Удалить', 'func': lambda id_: remove_widget(id_)}])
             widget.b1_func = lambda _, indx=indx: self.main.open_widget(widget.copy(indx))
+            widget.b2_func = lambda _, indx=indx: change_star(indx)
+
             grid_widget = ListWidget(widget)
+            grid_widget.title.setText(db.get_title_by_id(indx))
+            widget.preview.setScaledContents(True)
+            widget.preview.setPixmap(QPixmap(f'widgets\\w_{indx}\\preview.png'))
             self.box.addWidget(grid_widget, y, x, Qt.AlignmentFlag.AlignTop)
             if x == 2:
                 y += 1
