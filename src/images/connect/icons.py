@@ -10,3 +10,6 @@ pin = QIcon('src\\images\\pin.svg')
 
 star = QIcon('src\\images\\star.svg')
 full_star = QIcon('src\\images\\full_star.svg')
+
+hide = QIcon('src\\images\\hide.svg')
+close = QIcon('src\\images\\close.svg')

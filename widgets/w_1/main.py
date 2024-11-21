@@ -1,13 +1,20 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPlainTextEdit, QSizePolicy
 
 
 class Main(QWidget):
+    ''' Note '''
+    
     def __init__(self) -> None:
         super().__init__()
 
-        self.layout_test = QVBoxLayout()
-        self.label_test = QLabel('123')
-        self.layout_test.addWidget(self.label_test)
+        self.setFixedSize(300, 250)
 
-        self.setLayout(self.layout_test)
+        self.layout_note = QVBoxLayout()
+        self.label_note = QPlainTextEdit()
+        self.label_note.setStyleSheet('''margin: 5px; 
+                                      padding: 5px;
+                                      background: rgba(255, 255, 255, 0.1)''')
+        self.label_note.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        self.layout_note.addWidget(self.label_note)
+
+        self.setLayout(self.layout_note)

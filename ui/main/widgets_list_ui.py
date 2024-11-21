@@ -71,7 +71,7 @@ class Ui_Form(QWidget):
         buttons = QHBoxLayout()
         self.back_arrow = QPushButton('<')
         self.back_arrow.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.back_arrow.setFixedHeight(40)
+        self.back_arrow.setFixedHeight(47)
         self.back_arrow.setStyleSheet('''QPushButton {
                                       margin: 0;
                                       padding: 0;
@@ -93,13 +93,13 @@ class Ui_Form(QWidget):
         self.page_view = QLabel()
         self.page_view.setFont(fonts.line_edit)
         self.page_view.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
-        self.page_view.setFixedHeight(40)
+        self.page_view.setFixedHeight(47)
         self.page_view.setStyleSheet('''border-top: 1px solid #4F4F4F;
                                      padding: 0 10px;''')
 
         self.next_arrow = QPushButton('>')
         self.next_arrow.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
-        self.next_arrow.setFixedHeight(40)
+        self.next_arrow.setFixedHeight(47)
         self.next_arrow.setStyleSheet('''QPushButton {
                                       margin: 0;
                                       padding: 0;
@@ -174,7 +174,8 @@ class Ui_Form(QWidget):
         
         def export_widget(index: int) -> None:
             file, _ = QFileDialog.getSaveFileName(self, 'Сохранить файл', '', 'Виджет Qwidget (*.qwd)')
-            export(index, file)
+            if file:
+                export(index, file)
                 
 
         self.back_arrow.setDisabled(False)

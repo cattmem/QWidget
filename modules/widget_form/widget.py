@@ -43,11 +43,12 @@ class WidgetWindow(QWidget):
         self.main_widget = QWidget()
         self.main_widget.setStyleSheet('''background: rgba(128, 128, 128, 10);
                                        border-radius: 10px;''')
-        self.main_widget.setFixedSize(400, 350)
         
         self.data = main.Main()
+        self.main_widget.setFixedSize(self.data.size())
 
         custom_layout = QVBoxLayout()
+        custom_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         custom_widget = self.data
         custom_widget.setStyleSheet('''border: 1px solid rgba(128, 128, 128, 50);
                                     border-radius: 5px;
@@ -115,6 +116,10 @@ class WidgetWindow(QWidget):
         self.buttons_managment(False)
 
         self.main_layout.addLayout(self.buttons_layout)
+
+        spacer = QLabel()
+        spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.main_layout.addWidget(spacer)
 
         self.setLayout(self.main_layout)
     

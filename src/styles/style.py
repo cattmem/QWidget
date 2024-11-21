@@ -1,4 +1,5 @@
-#centralwidget {
+style = '''
+#centralwidget > QWidget {
     border-radius: 10px;
     background: #151515;
 }
@@ -18,14 +19,26 @@
     border-radius: 0;
     margin: 0;
     border-bottom: 1px solid #4F4F4F;
+    color: #818181;
+}
+
+#close:hover, #hide:hover {
+    background: #4F4F4F;
+    color: #151515;
 }
 
 #hide {
     background: #151515;
     border-left: 1px solid #4F4F4F;
 }
+#close {
+    border-top-right-radius: 10px;
+}
 
 
 #bottomSpace {
     border-top: 1px solid #4F4F4F;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
+'''
