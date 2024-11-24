@@ -1,49 +1,59 @@
 import sys
 
 from PyQt6.QtGui import QEnterEvent
-from PyQt6.QtWidgets import (QMainWindow, QWidget, QLineEdit,
-                             QVBoxLayout, QHBoxLayout, QPushButton,
+from PyQt6.QtWidgets import (QApplication, QWidget, QLineEdit, QVBoxLayout,
+                             QHBoxLayout, QPushButton,
                              QLabel, QSizePolicy)
 from PyQt6.QtCore import Qt, QSize
 
 from src.fonts.connect import fonts
 from src.images.connect import icons
+
 from database.connect import database as db
 
 
 class WidgetWindow(QWidget):
     def __init__(self, id_widget: int) -> None:
         super().__init__()
-        sys.path.append('widgets\\')
-        exec(f'from w_{id_widget} import main', globals())
 
-        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)    
+        self.id_widget = id_widget
+
+        sys.path.append('widgets/')
+        exec(f'from w_{id_widget} import main, config', globals())
+
+        self.type = config.type
+
+        self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose, True)
         self.setWindowFlag(Qt.WindowType.FramelessWindowHint)
-        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-        self.setAttribute(Qt.WidgetAttribute.WA_Hover, True)
-        
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground, True)
+
+        if self.type == 1:
+            self.start_work = self.work_widget
+        elif self.type == 2:
+            self.start_work = self.work_screen
+    
+    def work_widget(self) -> None:
         self.main_layout = QVBoxLayout()
         self.main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         self.main_layout.setContentsMargins(0, 0, 0, 0)
         self.main_layout.setSpacing(0)
 
-        self.title = QLineEdit(db.get_title_by_id(id_widget))
+        self.title = QLineEdit(db.get_title_by_id(self.id_widget))
         self.title.setStyleSheet('''QLineEdit {
-                                 background: rgba(0, 0, 0, 0);
                                  border: 0;
+                                 background: rgba(0, 0, 0, 0);
                                  padding-right: 20px;
                                  color: rgba(128, 128, 128, 60); }
                                  QLineEdit:focus {
                                  border: 1px solid rgba(128, 128, 128, 40);
                                  border-radius: 2px;
-                                 background: rgba(0, 0, 0, 0.01);
-                                 }''')
+                                 background: rgba(0, 0, 0, 0.01); }''')
         self.title.setFont(fonts.widget_title)
 
         self.main_widget = QWidget()
         self.main_widget.setStyleSheet('''background: rgba(128, 128, 128, 10);
                                        border-radius: 10px;''')
-        
+
         self.data = main.Main()
         self.main_widget.setFixedSize(self.data.size())
 
@@ -77,7 +87,7 @@ class WidgetWindow(QWidget):
                                          border-bottom-left-radius: 5px; }
                                          QPushButton:hover:!pressed {
                                          background: rgba(128, 128, 128, 50);
-                                         border: 0; } ''')
+                                         border: 0; }''')
         self.buttons_layout.addWidget(self.button_unload)
         self.buttons_layout.setParent(None)
 
@@ -94,7 +104,7 @@ class WidgetWindow(QWidget):
                                          border-right: 1px solid rgba(128, 128, 128, 50); }
                                          QPushButton:hover:!pressed {
                                          background: rgba(128, 128, 128, 50);
-                                         border: 0; } ''')
+                                         border: 0; }''')
         self.buttons_layout.addWidget(self.button_on_top)
 
         self.button_delete = QPushButton()
@@ -111,18 +121,35 @@ class WidgetWindow(QWidget):
                                          border-bottom-right-radius: 5px; }
                                          QPushButton:hover:!pressed {
                                          background: rgba(128, 128, 128, 50);
-                                         border: 0; } ''')
+                                         border: 0; }''')
         self.buttons_layout.addWidget(self.button_delete)
         self.buttons_managment(False)
 
         self.main_layout.addLayout(self.buttons_layout)
 
         spacer = QLabel()
-        spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        spacer.setSizePolicy(
+            QSizePolicy.Policy.Minimum,
+            QSizePolicy.Policy.Expanding)
         self.main_layout.addWidget(spacer)
 
         self.setLayout(self.main_layout)
     
+    def work_screen(self) -> None:
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+
+        self.data = main.Main()
+        custom_widget = self.data
+        screen = QApplication.primaryScreen().size()
+
+        self.setFixedSize(screen)
+
+        self.main_layout.addWidget(custom_widget)
+        self.setLayout(self.main_layout)
+
     def buttons_managment(self, flag: bool) -> None:
         for i in range(self.buttons_layout.count()):
             widget = self.buttons_layout.itemAt(i).widget()
@@ -132,17 +159,24 @@ class WidgetWindow(QWidget):
                 widget.hide()
 
     def leaveEvent(self, event: QEnterEvent | None) -> None:
-        self.buttons_managment(False)
-        super().leaveEvent(event)
-    
+        if self.type == 1:
+            self.buttons_managment(False)
+            super().leaveEvent(event)
+
     def enterEvent(self, event: QEnterEvent | None) -> None:
-        self.buttons_managment(True)
-        super().enterEvent(event)
+        if self.type == 1:
+            self.buttons_managment(True)
+            super().enterEvent(event)
 
     def mousePressEvent(self, event) -> None:
-        self.drag_pos = event.globalPosition().toPoint()
+        if self.type == 1:
+            self.drag_pos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event) -> None:
-        self.move(self.pos() + event.globalPosition().toPoint() - self.drag_pos)
-        self.drag_pos = event.globalPosition().toPoint()
-        event.accept()
+        if self.type == 1:
+            self.move(
+                self.pos() +
+                event.globalPosition().toPoint() -
+                self.drag_pos)
+            self.drag_pos = event.globalPosition().toPoint()
+            event.accept()

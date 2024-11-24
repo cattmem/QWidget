@@ -7,7 +7,7 @@ class Widget:
                  b1_icon, b1_func,
                  b2_icon, b2_func, context_menu: list[dict]) -> None:
         self.id = id_
-        self.qwidget = widget.WidgetWindow(self.id)
+        self.qwidget = None
 
         self.title = title
         self.preview = preview
@@ -22,10 +22,13 @@ class Widget:
         self.b2_func = b2_func
 
         self.context_menu = context_menu
-    
+
+    def work(self) -> None:
+        self.qwidget = widget.WidgetWindow(self.id)
+
     def copy(self, id_=None):
         if id_ is None:
-            id_ = self.id 
+            id_ = self.id
         return Widget(id_, self.loaded,
                       self.title, self.preview, self.type,
                       self.b1_icon, self.b1_func,

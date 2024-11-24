@@ -4,29 +4,31 @@ from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import (QApplication, QMainWindow,
                              QLabel, QPushButton,
                              QSizePolicy, QFileDialog)
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt
 
 from ui.main_ui import Ui_MainWindow
+from ui.main import home_ui as main_home
+from ui.main import widgets_list_ui as main_widgets
 
 from modules.widget_data import Widget
 from modules.widget_files_managment import import_
+from modules import loger as lg
 
 from src.fonts.connect import fonts
 from src.images.connect import icons
 from src.styles import style
 
-import ui.main.home_ui as main_home
-import ui.main.widgets_list_ui as main_widgets
+from database.connect import database as db
 
 
 class MainWindow(QMainWindow):
-    
+
     def __init__(self) -> None:
         super().__init__()
 
-        self.TOP_MENU = [{ 'title': 'Главная', 'frame': main_home }, 
-        { 'title': 'Виджеты', 'frame': main_widgets }]
-        self.BOTTOM_MENU = [{ 'title': 'Импорт', 'func': self.select_file }]
+        self.TOP_MENU = [{'title': 'Главная', 'frame': main_home},
+                         {'title': 'Виджеты', 'frame': main_widgets}]
+        self.BOTTOM_MENU = [{'title': 'Импорт', 'func': self.select_file}]
 
         self.all_menu = [self.TOP_MENU, self.BOTTOM_MENU]
 
@@ -39,9 +41,10 @@ class MainWindow(QMainWindow):
         self.widgets = []
 
         self.initUI()
-    
+
     def initUI(self) -> None:
-        # easy data
+        lg.info('init ui')
+
         self.main = self.ui.stackedWidget
         self.side_menu = self.ui.leftSideLayout
 
@@ -50,7 +53,9 @@ class MainWindow(QMainWindow):
 
         self.ui.topLayout.setContentsMargins(189, 0, 0, 0)
         spacer = QLabel()
-        spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        spacer.setSizePolicy(
+            QSizePolicy.Policy.Minimum,
+            QSizePolicy.Policy.Expanding)
         spacer.setMaximumHeight(30)
         spacer.setStyleSheet('border-right: 1px solid #4F4F4F;')
         self.side_menu.addWidget(spacer)
@@ -82,10 +87,12 @@ class MainWindow(QMainWindow):
 
             if i + 1 != len(self.all_menu):
                 spacer = QLabel()
-                spacer.setSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+                spacer.setSizePolicy(
+                    QSizePolicy.Policy.Minimum,
+                    QSizePolicy.Policy.Expanding)
                 spacer.setStyleSheet('border-right: 1px solid #4F4F4F;')
                 self.side_menu.addWidget(spacer)
-        
+
         self.buttons_page[0].click()
         for i in range(len(self.buttons_func)):
             self.style_btn(self.buttons_func, i, False)
@@ -98,13 +105,14 @@ class MainWindow(QMainWindow):
         self.ui.close.clicked.connect(self.close)
         self.ui.hide.clicked.connect(self.showMinimized)
         self.ui.hide.setText('–')
-    
+
     def change_page(self) -> None:
         i = int(self.buttons_page.index(self.sender()))
+        lg.info(f'page changed ({i})')
         self.main.setCurrentIndex(i)
 
         self.style_btn(self.buttons_page, i)
-    
+
     def style_btn(self, list_: list, i: int, is_active: bool = True) -> None:
         if not is_active:
             i = i + 1
@@ -145,84 +153,124 @@ class MainWindow(QMainWindow):
                                   background: #3A5CE4;
                                   color: #151515; }
                                   ''')
-                
+
     def open_widget(self, widget: Widget) -> None:
+        lg.info(f'new widget (loaded, {widget.id}, {widget.title.text()}, {widget.type})')
+        widget.work()
+        widget.qwidget.start_work()
+        widget.type = widget.qwidget.type
         self.widgets.append(widget)
         self.load_widget(widget)
         widget.qwidget.show()
-        widget.qwidget.destroyed.connect(lambda _, w=widget: self.remove_widget(w, True))
-        widget.qwidget.button_unload.clicked.connect(lambda _, w=widget: self.unload_widget(w))
-        widget.qwidget.button_on_top.clicked.connect(lambda _, w=widget: self.pin_widget(w))
-        widget.qwidget.button_delete.clicked.connect(lambda _, w=widget: self.remove_widget(w))
+        widget.qwidget.destroyed.connect(
+            lambda _, w=widget: self.remove_widget(w, True))
+        if widget.type == 1:
+            widget.qwidget.button_unload.clicked.connect(
+                lambda _, w=widget: self.unload_widget(w))
+            widget.qwidget.button_on_top.clicked.connect(
+                lambda _, w=widget: self.pin_widget(w))
+            widget.qwidget.button_delete.clicked.connect(
+                lambda _, w=widget: self.remove_widget(w))
         widget.context_menu.clear()
 
         widget.b2_func = lambda _, w=widget: self.remove_widget(w)
         widget.b2_icon = icons.delete
 
         self.update_forms()
-    
+
     def pin_widget(self, widget: Widget) -> None:
+        lg.info(
+            f'widget pin (loaded, {widget.id}, {widget.title.text()}, {widget.type})')
         if widget.qwidget.windowFlags() & Qt.WindowType.WindowStaysOnTopHint:
-            widget.qwidget.setWindowFlags(widget.qwidget.windowFlags() & ~Qt.WindowType.WindowStaysOnTopHint)
+            widget.qwidget.setWindowFlags(
+                widget.qwidget.windowFlags() & ~Qt.WindowType.WindowStaysOnTopHint)
         else:
-            widget.qwidget.setWindowFlags(widget.qwidget.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+            widget.qwidget.setWindowFlags(
+                widget.qwidget.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
         widget.qwidget.show()
 
     def load_widget(self, widget: Widget) -> None:
+        lg.info(
+            f'widget loaded ({widget.id}, {widget.title.text()}, {widget.type})')
         widget.loaded = True
         widget.b1_func = lambda _, w=widget: self.unload_widget(w)
         widget.b1_icon = icons.unload
         widget.qwidget.show()
         self.update_forms()
-    
+
     def remove_widget(self, widget: Widget, by_user: bool = False) -> None:
         try:
+            lg.info(
+                f'widget removed ({widget.id}, {widget.title.text()}, {widget.type})')
             if not by_user:
                 widget.qwidget.destroy()
             self.widgets.remove(widget)
-        except Exception:
-            pass
+            widget.qwidget = None
+        except Exception as err:
+            lg.warn(f'{type(err)}')
 
         self.update_forms()
-    
+
     def unload_widget(self, widget: Widget) -> None:
+        lg.info(f'widget unloaded ({widget.id}, {widget.title.text()}, {widget.type})')
         widget.loaded = False
         widget.b1_func = lambda _, w=widget: self.load_widget(w)
         widget.b1_icon = icons.load
         widget.qwidget.hide()
-        
+
         self.update_forms()
-    
+
     def update_forms(self) -> None:
-        self.forms[0].data_load.update(list(filter(lambda w: w.loaded, self.widgets)))
-        self.forms[0].data_unload.update(list(filter(lambda w: not w.loaded, self.widgets)))
+        lg.info(f'updated lists (loaded/unloaded widgets)')
+        self.forms[0].data_load.update(
+            list(filter(lambda w: w.loaded, self.widgets)))
+        self.forms[0].data_unload.update(
+            list(filter(lambda w: not w.loaded, self.widgets)))
 
         self.update_preview()
-    
+
     def select_file(self, _) -> None:
-        file, _ = QFileDialog.getOpenFileName(self, 'Открыть файл', '', 'Виджет Qwidget (*.qwd)')
+        file, _ = QFileDialog.getOpenFileName(
+            self, 'Открыть файл', '', 'Виджет Qwidget (*.qwd)')
         if file:
+            lg.info(f'try import widget ({file})')
             import_(file)
-    
+
     def update_preview(self) -> None:
+        lg.info(f'updated preview (loaded/unloaded widgets)')
+
         for w in self.widgets:
-            w.preview.setPixmap(
-                w.qwidget.grab(w.qwidget.rect()).scaled(w.preview.size(), Qt.AspectRatioMode.KeepAspectRatio)
-            )
-            w.title.setText(w.qwidget.title.text())
+            if w.type == 1:
+                w.preview.setPixmap(
+                    w.qwidget.main_widget.grab(w.qwidget.main_widget.rect())
+                    .scaled(w.preview.size(), Qt.AspectRatioMode.KeepAspectRatio)
+                )
+                w.title.setText(w.qwidget.title.text())
+            else:
+                w.title.setText(db.get_title_by_id(w.id))
+
+    def closeEvent(self, _) -> None:
+        lg.to_file()
 
     def mousePressEvent(self, event) -> None:
         self.drag_pos = event.globalPosition().toPoint()
 
     def mouseMoveEvent(self, event) -> None:
-        self.move(self.pos() + event.globalPosition().toPoint() - self.drag_pos)
-        self.drag_pos = event.globalPosition().toPoint()
-        event.accept()
+        try:
+            self.move(
+                self.pos() +
+                event.globalPosition().toPoint() -
+                self.drag_pos)
+            self.drag_pos = event.globalPosition().toPoint()
+            event.accept()
+        except Exception as _:
+            pass
 
 
 if __name__ == '__main__':
-    app = QApplication(sys.argv)
+    lg.info(f'work started')
 
+    app = QApplication(sys.argv)
     app.setStyleSheet(style.style)
 
     ex = MainWindow()

@@ -1,6 +1,8 @@
 import os
 import py7zr
 
+from modules import loger as lg
+
 from database.connect import database as db
 
 
@@ -11,6 +13,7 @@ def export(id_: int, to_path: str) -> None:
             for file in files:
                 file = os.path.join(root, file)
                 zip_.write(file, os.path.relpath(file, folder_path))
+    lg.info(f'export succes ({folder_path} --> {to_path})')
 
 
 def import_(path: str) -> None:
@@ -21,3 +24,5 @@ def import_(path: str) -> None:
 
     with py7zr.SevenZipFile(path, mode='r') as zip_:
         zip_.extractall(path=output_folder)
+
+    lg.info(f'import succes ({path} --> {output_folder})')

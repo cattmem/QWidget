@@ -1,7 +1,6 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout,
-                             QPushButton, QLabel,
-                             QSizePolicy)
+from PyQt6.QtWidgets import (QWidget, QVBoxLayout,
+                             QLabel, QSizePolicy)
 
 from src.fonts.connect import fonts
 
@@ -16,7 +15,9 @@ class NoneWidget(QWidget):
         all_widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         label = QLabel('Пусто')
-        label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        label.setSizePolicy(
+            QSizePolicy.Policy.Expanding,
+            QSizePolicy.Policy.Expanding)
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         label.setFont(fonts.side)
         label.setStyleSheet('color: #818181')
