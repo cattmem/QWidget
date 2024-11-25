@@ -1,17 +1,19 @@
 import sys
+from functools import partial
 
 from PyQt6.QtCore import QTimer
 from PyQt6.QtWidgets import (QApplication, QMainWindow,
-                             QLabel, QPushButton,
+                             QLabel, QPushButton, QMenu,
                              QSizePolicy, QFileDialog)
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QAction
 
 from ui.main_ui import Ui_MainWindow
 from ui.main import home_ui as main_home
 from ui.main import widgets_list_ui as main_widgets
 
 from modules.widget_data import Widget
-from modules.widget_files_managment import import_
+from modules.widget_files_managment import import_, import_from_folder
 from modules import loger as lg
 
 from src.fonts.connect import fonts
@@ -26,9 +28,10 @@ class MainWindow(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
 
-        self.TOP_MENU = [{'title': 'Главная', 'frame': main_home},
-                         {'title': 'Виджеты', 'frame': main_widgets}]
-        self.BOTTOM_MENU = [{'title': 'Импорт', 'func': self.select_file}]
+        self.TOP_MENU = ({'title': 'Главная', 'frame': main_home},
+                         {'title': 'Виджеты', 'frame': main_widgets})
+        self.BOTTOM_MENU = ({'title': 'Импорт', 'func': self.select_file,
+                             'menu': {'title': 'Импорт как папка', 'func': self.select_folder}},)
 
         self.all_menu = [self.TOP_MENU, self.BOTTOM_MENU]
 
@@ -84,6 +87,13 @@ class MainWindow(QMainWindow):
                     button.setStyleSheet('''
                     ''')
                     self.buttons_func.append(button)
+                
+                if 'menu' in page.keys():
+                    self.menu_data = page['menu']
+                    
+                    button.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+                    button.customContextMenuRequested.connect(lambda e, me=button: self.context_menu(e, me))
+
 
             if i + 1 != len(self.all_menu):
                 spacer = QLabel()
@@ -153,6 +163,17 @@ class MainWindow(QMainWindow):
                                   background: #3A5CE4;
                                   color: #151515; }
                                   ''')
+
+    def context_menu(self, event, me: QPushButton):
+        context_menu = []
+        menu = QMenu(self)
+
+        context_menu.append(QAction(self.menu_data['title'], self))
+        context_menu[-1].setFont(fonts.side)
+        context_menu[-1].triggered.connect(self.menu_data['func'])
+        menu.addAction(context_menu[-1])
+
+        menu.exec(me.mapToGlobal(event))
 
     def open_widget(self, widget: Widget) -> None:
         lg.info(f'new widget (loaded, {widget.id}, {widget.title.text()}, {widget.type})')
@@ -235,6 +256,13 @@ class MainWindow(QMainWindow):
         if file:
             lg.info(f'try import widget ({file})')
             import_(file)
+        
+    def select_folder(self, _) -> None:
+        folder = QFileDialog.getExistingDirectory(
+            self, 'Открыть папку', '', QFileDialog.Option.ShowDirsOnly)
+        if folder:
+            lg.info(f'try import widget ({folder})')
+            import_from_folder(folder)
 
     def update_preview(self) -> None:
         lg.info(f'updated preview (loaded/unloaded widgets)')

@@ -1,24 +1,19 @@
 from PyQt6.QtGui import QIcon
 
+add = QIcon('src/images/add.svg')
+delete = QIcon('src/images/delete.svg')
 
-def path(file: str) -> str:
-    return f'src/images/{file}'
+load = QIcon('src/images/load.svg')
+unload = QIcon('src/images/unload.svg')
+reload_ = QIcon('src/images/reload.svg')
 
+pin = QIcon('src/images/pin.svg')
 
-add = QIcon(path('add.svg'))
-delete = QIcon(path('delete.svg'))
+star = QIcon('src/images/star.svg')
+full_star = QIcon('src/images/full_star.svg')
 
-load = QIcon(path('load.svg'))
-unload = QIcon(path('unload.svg'))
-reload_ = QIcon(path('reload.svg'))
+hide = QIcon('src/images/hide.svg')
+close = QIcon('src/images/close.svg')
 
-pin = QIcon(path('pin.svg'))
-
-star = QIcon(path('star.svg'))
-full_star = QIcon(path('full_star.svg'))
-
-hide = QIcon(path('hide.svg'))
-close = QIcon(path('close.svg'))
-
-left_arrow = QIcon(path('left_arrow.svg'))
-right_arrow = QIcon(path('right_arrow.svg'))
+left_arrow = QIcon('src/images/left_arrow.svg')
+right_arrow = QIcon('src/images/right_arrow.svg')

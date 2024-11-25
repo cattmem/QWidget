@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QPushButton,
                              QSizePolicy, QListWidget, QFileDialog)
 
 import cv2
-from pyzbar.pyzbar import decode
+import pyzbar
 
 
 class Main(QWidget):
@@ -42,7 +42,7 @@ class Main(QWidget):
         image = cv2.imread(file)
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-        qr_codes = decode(image)
+        qr_codes = pyzbar.pyzbar.decode(image)
         self.qr_codes.clear()
 
         for idx, qr_code in enumerate(qr_codes):

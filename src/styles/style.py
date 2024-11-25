@@ -57,6 +57,6 @@ QMenu::item {
 }
 QMenu::item:selected {
     background: #4F4F4F;
-    color: #151515
+    color: #151515;
 }
 '''
